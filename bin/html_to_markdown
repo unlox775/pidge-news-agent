@@ -5,11 +5,27 @@ const nhm = new NodeHtmlMarkdown();
 
 let inputData = '';
 let limitWords;
+let limitChars;
+let verbose = false;
+
+// Check for --verbose or -v argument
+if (process.argv.indexOf('--verbose') !== -1
+  || process.argv.indexOf('-v') !== -1
+    ) {
+    verbose = true;
+}
+
 
 // Check for --limit-words argument
-const limitIndex = process.argv.indexOf('--limit-words');
-if (limitIndex !== -1 && process.argv[limitIndex + 1]) {
-    limitWords = parseInt(process.argv[limitIndex + 1], 10);
+const limitWordsIdx = process.argv.indexOf('--limit-words');
+if (limitWordsIdx !== -1 && process.argv[limitWordsIdx + 1]) {
+    limitWords = parseInt(process.argv[limitWordsIdx + 1], 10);
+}
+
+// Check for --limit-chars argument
+const limitCharsIdx = process.argv.indexOf('--limit-chars');
+if (limitCharsIdx !== -1 && process.argv[limitCharsIdx + 1]) {
+    limitChars = parseInt(process.argv[limitCharsIdx + 1], 10);
 }
 
 process.stdin.on('data', chunk => {
@@ -18,6 +34,8 @@ process.stdin.on('data', chunk => {
 
 process.stdin.on('end', () => {
   let markdown = nhm.translate(inputData);
+
+  const originalChars = markdown.length;
 
   if (limitWords && !isNaN(limitWords)) {
     let wordsCounted = 0;
@@ -37,7 +55,18 @@ process.stdin.on('end', () => {
       markdown = markdown.substring(0, lastMatchIndex);
     }
     // Print to stderr "Number of words: <number>"
-    process.stderr.write(`Number of words: ${wordsCounted}\n`);
+    if (verbose) {
+      process.stderr.write(`Number of words: ${wordsCounted}\n`);
+    }
+  }
+
+  if (limitChars && !isNaN(limitChars)) {
+    // Print to stderr "Number of chars: <number>"
+    if (verbose) {
+      process.stderr.write(`Number of chars: ${originalChars} (after word limit: ${markdown.length})\n`);
+    }
+
+    markdown = markdown.substring(0, limitChars);
   }
 
   process.stdout.write(markdown);
