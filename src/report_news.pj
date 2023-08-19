@@ -1,0 +1,22 @@
+bring :db
+Context.prompt_base("report_news")
+
+Context.add_conversation(:reporter)
+Context.add_conversation(:editor)
+
+# Load context recently
+articles_grouped = Local.ReportNews.group_articles_by_time_period(db)
+
+# Load DB with any completed months
+foreach(articles_grouped.months, fn {articles, month} ->
+  if ! db.by_month[month] do
+    db.by_month[month] = ai_object_extract("db/00_summarize_month")
+  end
+end)
+
+last_year_by_month = Local.ReportNews.last_year_by_month(db, articles_grouped)
+
+# compile top ten items from last week, month, year
+last_week_news = ai_prompt(:reporter, "reporter/01_summarize_last_week")
+last_month_news = ai_prompt(:reporter, "reporter/02_summarize_last_month")
+last_year_news = ai_prompt(:reporter, "reporter/03_summarize_last_year")

@@ -1,0 +1,13 @@
+Please from this select All > Copy of a news web page, please find the first article, ignoring the header and any ads.  Give me a quick json of:
+
+{
+    "article_name": "The amazing Flippy Fish",
+    "first_few_words_of_each_piece_of_text_in_article_listing": [
+        "Aug, 13, 2023", "A previously detected","Animal Articles"
+    ]
+}
+
+We will be using these first-few-words in a moment in another script.  They just need to be actual excerpts of different parts of the article listing.
+
+news web page copy/paste:
+{{ input }}

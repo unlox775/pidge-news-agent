@@ -1,0 +1,11 @@
+Given this HTML, which IS a real article:
+
+{{ first_article_dom }}
+
+And this HTML which is an Ad:
+
+{{ first_possible_ad_dom }}
+
+Please find the differences, and give me a test we can add to our JS to exclude articles that are really ads.  The detection JS code I want to add this to is this:
+
+{{ parser_js }}

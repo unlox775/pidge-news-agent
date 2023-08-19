@@ -1,0 +1,39 @@
+I am interested in staying up with the news on this:
+
+{{ input }}
+
+Can you give me a JSON of a list of URLs of news sites I might have better luck using?
+  
+Please also give me a list of 2 or 3 search terms I could use on each search engine which might help me be more effective.  Please distinguish between sites that the home page is a list of articles that is already relevant (without needing a search term) and sites that require a search term to be effective to find the news we need.  Give this as a `type` value, one of:
+
+- `no_search` - no search term needed
+- `search_url` - meaning you are providing with a URL that has a `[TERM]` placeholder
+- `search_page` - meaning this is a page I will need to load, find the search box, type in the search term, and click the search button
+
+This is an example of what I am looking for when I am looking for "hacker exploits, especially mentions of SAAS companies that were hacked":
+
+{
+    "search_engines": {
+        "Hacker News": {
+            "type": "no_search",
+            "url": "https://thehackernews.com/"
+        },
+        "Google News": {
+            "type": "search_url",
+            "url": "https://www.google.com/search?q=[TERM]&tbm=nws",
+            "search_terms": [
+                "hacker exploits",
+                "saas hacks",
+                "saas data breach",
+            ]
+        },
+        "Symantec":{
+            "type": "search_page",
+            "url": "https://www.symantec.com/",
+            "search_terms": [
+                "saas",
+                "data",
+            ]
+        }
+    }
+}

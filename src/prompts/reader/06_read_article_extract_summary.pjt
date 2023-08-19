@@ -1,0 +1,30 @@
+Please read this article, and afterwards summarize it in the format below:
+
+Start Article:
+=====================
+{{ input }}
+=====================
+End Article
+
+As a reminder, this is a summary of the types of news articles we are looking for (and some information about locales):
+
+{{ search_intent }}
+
+Please summarize in the following example format:
+
+{
+    "title": "Apes seen looting local walmarts",
+    "date": "2021-01-01", // in ISO 8601 format 
+    "medium_summmary": "Over the last few days, apes have been seen looting local walmarts.  The employees are scared, and the apes are not wearing masks.  Local zoos insist that they have no missing animals. Most all of the shelves are empty broken, or completely missing.  The apes are also seen eating bananas and throwing the peels on the floor.  The police have been called, but they are not able to catch the apes, but they not able to shoot the apes because they are endangered.",
+    "one_thorough_sentence_summary": "Apes are looting local walmarts, and the police are not able to stop them because they are endangered.",
+    "parties_most_affected": {
+        "apes": "they are being shot at by police.",
+        "walmart": "they are losing a lot of money."
+        "customers": "they are not able to shop at walmart."
+    },
+    "geographic_area_affected": "southern florida, near the everglades.", // or "n/a"
+    "timeframe_in_weeks": 2,
+    "relevant_to_my_search": false, // or true if you really are sure this is a match
+    "closest_of_my_locales": "salt lake city, utah", // or null if this is not geographically relevant at all like something on the internet affecting the whole world
+    "est_miles_from_closest_of_my_locales": 1649, // or null
+}

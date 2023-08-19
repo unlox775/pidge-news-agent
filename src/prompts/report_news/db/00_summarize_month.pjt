@@ -1,0 +1,16 @@
+This is a list of all the articles in the month of {{ month }}:
+
+{{ json.articles }}
+
+Please summarize them, grabbing "medium_summmary" from the top 5 most important of the stories, and representing them in a JSON like this:
+
+{
+  "articles": [
+    {
+      "title": "The title of the article",
+      "medium_summary": "The summary of the article",
+      "url": "The URL of the article"
+    },
+    ...
+  ]
+}

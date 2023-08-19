@@ -1,0 +1,18 @@
+In this string content, give me a list of of the ID's and article names you think are ads.:
+
+{{ input }}
+
+Give them to me as an output like this (only the first 5-10 words of the summary_excerpt are needed):
+
+{
+    "possible_ads_by_name": [
+        {
+            "name": "Experts Uncover Weaknesses in PowerShell Gallery Enabling Supply Chain Attacks",
+            "summary_excerpt": "The PowerShell Gallery is a popular resource for "
+        },
+        {
+            "name": "Artists find new ways to sell their art online",
+            "summary_excerpt": "The pandemic has forced many artists to find"
+        }
+    ]
+}
