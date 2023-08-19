@@ -1,4 +1,4 @@
-bring :db
+bring :db, :search_intent
 Context.prompt_base("report_news")
 
 Context.add_conversation(:reporter)
@@ -10,7 +10,7 @@ articles_grouped = Local.ReportNews.group_articles_by_time_period(db)
 # Load DB with any completed months
 foreach(articles_grouped.months, fn {articles, month} ->
   if ! db.by_month[month] do
-    db.by_month[month] = ai_object_extract("db/00_summarize_month")
+    db.by_month[month] = ai_object_extract(:reporter, "reporter/00_summarize_month")
   end
 end)
 
@@ -20,3 +20,8 @@ last_year_by_month = Local.ReportNews.last_year_by_month(db, articles_grouped)
 last_week_news = ai_prompt(:reporter, "reporter/01_summarize_last_week")
 last_month_news = ai_prompt(:reporter, "reporter/02_summarize_last_month")
 last_year_news = ai_prompt(:reporter, "reporter/03_summarize_last_year")
+
+report =
+  ai_prompt(:editor, "editor/04_report_the_news")
+
+last_reported = Local.ReportNews.update_last_reported(report, last_reported)

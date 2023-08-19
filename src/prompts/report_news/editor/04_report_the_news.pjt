@@ -1,0 +1,21 @@
+This is the news summary of the last year or so:
+
+{{ last_year_news }}
+
+This is the news summary of the last month or so:
+
+{{ last_month_news }}
+
+This is the news summary of the last week or so:
+
+{{ last_week_news }}
+
+This is what you last reported to me on {{ last_reported.last_report_date }}. Please try not to report anything you reported recently:
+
+{{ last_reported.last_report }}
+
+This is my overall intent and what kind of news I'm interested in:
+
+{{ search_intent }}
+
+Please give me a news report, telling me the most important news since I last got a report from you.  Please where relevant let me know where I might go to find out more.
