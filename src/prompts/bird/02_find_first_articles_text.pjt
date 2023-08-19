@@ -1,5 +1,8 @@
 Please from this select All > Copy of a news web page, please find the first article, ignoring the header and any ads.  Give me a quick json of:
 
+A json of {" first": ZZZ, "second": YYY} only the first 2 articles
+
+Where ZZZ and YYY are this format:
 {
     "article_name": "The amazing Flippy Fish",
     "first_few_words_of_each_piece_of_text_in_article_listing": [
@@ -10,4 +13,5 @@ Please from this select All > Copy of a news web page, please find the first art
 We will be using these first-few-words in a moment in another script.  They just need to be actual excerpts of different parts of the article listing.
 
 news web page copy/paste:
+=========================
 {{ input }}

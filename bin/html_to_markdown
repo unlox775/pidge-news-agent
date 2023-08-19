@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+
+const { NodeHtmlMarkdown } = require('node-html-markdown');
+const nhm = new NodeHtmlMarkdown();
+
+let inputData = '';
+let limitWords;
+
+// Check for --limit-words argument
+const limitIndex = process.argv.indexOf('--limit-words');
+if (limitIndex !== -1 && process.argv[limitIndex + 1]) {
+    limitWords = parseInt(process.argv[limitIndex + 1], 10);
+}
+
+process.stdin.on('data', chunk => {
+  inputData += chunk;
+});
+
+process.stdin.on('end', () => {
+  let markdown = nhm.translate(inputData);
+
+  if (limitWords && !isNaN(limitWords)) {
+    let wordsCounted = 0;
+    let lastMatchIndex = 0;
+    
+    markdown.replace(/(\W+|\w+)/g, (match, _, index) => {
+      if (/\w/.test(match)) {
+        wordsCounted++;
+      }
+
+      if (wordsCounted === limitWords) {
+        lastMatchIndex = index + match.length;
+      }
+    });
+
+    if (wordsCounted > limitWords) {
+      markdown = markdown.substring(0, lastMatchIndex);
+    }
+    // Print to stderr "Number of words: <number>"
+    process.stderr.write(`Number of words: ${wordsCounted}\n`);
+  }
+
+  process.stdout.write(markdown);
+});
