@@ -42,9 +42,9 @@ foreach(search_sites.search_engines, fn {site, i} ->
     |> html_js_exec(js: parser_js)
 
   possible_ads =
-    |> ai_object_extract(:parser, "parser/04_find_the_ads")
+    ai_object_extract(:parser, "parser/04_find_the_ads")
 
-  if count(possible_ads) > 0 then
+  if count(possible_ads) > 0 do
     first_possible_ad_html =
       html
       |> find_subhtml(
@@ -55,6 +55,7 @@ foreach(search_sites.search_engines, fn {site, i} ->
     parser_js =
       ai_prompt(:parser, "parser/05_revise_the_parser_js")
       |> js_script_extract()
+  end
 
   search_sites[i].parser_js = parser_js
 end, async: true)
@@ -66,11 +67,11 @@ foreach(search_sites.search_engines, fn {site, i} ->
     "no_search" -> search_urls = [site.url]
     "search_url" ->
       foreach(site.search_term, fn term ->
-        search_urls += Local.swap_url_term(site.url, term)
+        search_urls <~ Local.swap_url_term(site.url, term)
       end)
     "search_page" ->
       foreach(site.search_term, fn term ->
-        search_urls += try_all_inputs_enterkey(site.search_term[0])
+        search_urls <~ try_all_inputs_enterkey(site.search_term[0])
       end)
   end
 
