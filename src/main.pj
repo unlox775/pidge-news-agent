@@ -6,7 +6,7 @@ search_intent = ai_prompt(:bird, "bird/00_confirm_search_intent", human_input: t
 
 new_search_sites =
   search_intent
-  |> ai_object_extract(:bird, "bird/01_get_new_sites_and_terms", human_input: true)
+  |> ai_object_extract(:bird, "bird/01_get_new_sites_and_terms")
 search_sites.search_engines <~ new_search_sites.search_engines
 
 # Compile a parser_js for each site
@@ -34,12 +34,12 @@ foreach(search_sites.search_engines, fn {site, i} ->
 
   first_article_html =
     html
-    |> find_subhtml(string: first_article_strings.article_name, ext_strings: first_article_strings.first_few_words_of_each_piece_of_text_in_article_listing)
+    |> Local.find_subhtml(string: first_article_strings.article_name, ext_strings: first_article_strings.first_few_words_of_each_piece_of_text_in_article_listing)
 
-  parser_js = ai_prompt(:parser, "parser/03_generate_detect_js") |> js_script_extract()
+  parser_js = ai_prompt(:parser, "parser/03_generate_detect_js") |> Local.js_script_extract()
   all_articles =
     html
-    |> html_js_exec(js: parser_js)
+    |> Local.html_js_exec(js: parser_js)
 
   possible_ads =
     ai_object_extract(:parser, "parser/04_find_the_ads")
@@ -47,18 +47,18 @@ foreach(search_sites.search_engines, fn {site, i} ->
   if count(possible_ads) > 0 do
     first_possible_ad_html =
       html
-      |> find_subhtml(
+      |> Local.find_subhtml(
         string: possible_ads.possible_ads_by_name[0].name,
         ext_strings: [possible_ads.possible_ads_by_name[0].summary]
         )
 
     parser_js =
       ai_prompt(:parser, "parser/05_revise_the_parser_js")
-      |> js_script_extract()
+      |> Local.js_script_extract()
   end
 
   search_sites[i].parser_js = parser_js
-end, async: true)
+end) # , async: true
 
 # Get the most recent articles from each site
 foreach(search_sites.search_engines, fn {site, i} ->
@@ -66,12 +66,12 @@ foreach(search_sites.search_engines, fn {site, i} ->
   case site.type do
     "no_search" -> search_urls = [site.url]
     "search_url" ->
-      foreach(site.search_term, fn term ->
+      foreach(site.search_term, fn {term,i} ->
         search_urls <~ Local.swap_url_term(site.url, term)
       end)
     "search_page" ->
-      foreach(site.search_term, fn term ->
-        search_urls <~ try_all_inputs_enterkey(site.search_term[0])
+      foreach(site.search_term, fn {term,i} ->
+        search_urls <~ Local.try_all_inputs_enterkey(site.search_term[0])
       end)
   end
 
@@ -80,7 +80,7 @@ foreach(search_sites.search_engines, fn {site, i} ->
 
     all_articles =
       html
-      |> html_js_exec(js: site.parser_js)
+      |> Local.html_js_exec(js: site.parser_js)
 
     foreach(all_articles, fn {article, article_i} ->
       article_summary =
@@ -91,10 +91,10 @@ foreach(search_sites.search_engines, fn {site, i} ->
       article_summary.url = article.url
 
       all_articles[article_i].ai_summary = article_summary
-    end, async: true)
+    end) # , async: true
 
     db = Local.store_articles_in_db(all_articles, db)
   end)
-end, async: false) # false until we have DB concurrency
+end) # , async: false # false until we have DB concurrency
 
 fly(:report_news)
