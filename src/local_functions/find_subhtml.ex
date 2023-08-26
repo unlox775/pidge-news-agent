@@ -7,8 +7,11 @@ def function(html, article_name, first_few_words_of_each_piece_of_text_in_articl
   IO.puts("Running: bin/get_subhtml --input #{tmp_file_path} --article_name #{article_name} #{first_few_words_of_each_piece_of_text_in_article_listing |> Enum.join(" ")}}")
   {subhtml, 0} = System.cmd("bin/get_subhtml", ["--input", tmp_file_path, "--article_name", article_name] ++ first_few_words_of_each_piece_of_text_in_article_listing, into: "")
 
+  # parse subhtml as a JSON object
+  subhtml_json = Jason.decode!(subhtml)
+
   # remove the temp file
   File.rm!(tmp_file_path)
 
-  subhtml
+  subhtml_json
 end

@@ -1,6 +1,12 @@
 Ok, I have this DOM element:
 
-{{ first_article_html }}
+{{ first_article_html.node_html }}
+
+And these are all of it's parents open HTML tags:
+
+{% for tag in first_article_html.ancestors %}
+- {{ tag }}
+{% endfor %}
 
 Now, I want you to give me some JS based on this HTML, to detect and find all of the articles on this page, and extract the following JSON format for each:
 
@@ -10,4 +16,13 @@ Now, I want you to give me some JS based on this HTML, to detect and find all of
     "date": "Aug 17, 2023",
     "link": "https://thehackernews.com/2023/08/nofilter-attack-sneaky-privilege.html",
     "summary": "A previously undetected attack method called NoFilter has been found to abuse the Windows Filtering Platform (WFP) to achieve privilege escalation in the Windows operating system."
-  }
+}
+
+Now, I for sure want only these 5 keys in my output HTML JSON:
+- name
+- author
+- date
+- link
+- summary
+
+Please don't leave any keys out!!  If there is no value for a key, just leave it blank.

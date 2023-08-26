@@ -10,9 +10,9 @@ new_search_sites =
 search_sites.search_engines <~ new_search_sites.search_engines
 sites = Local.get_sites_list(search_sites.search_engines)
 
-# Compile a parser_js for each site
+# Compile a extractor_json for each site
 foreach(sites, fn {site, i} ->
-  if site.parser_js do
+  if site.extractor_json do
     continue
   end
 
@@ -38,10 +38,10 @@ foreach(sites, fn {site, i} ->
     first_articles_strings.first.first_few_words_of_each_piece_of_text_in_article_listing
     )
 
-  parser_js = ai_codeblock_extract(:parser, "parser/03_generate_detect_js", :javascript, largest: true)
-  all_articles =
-    html
-    |> Local.html_js_exec(parser_js)
+  extractor_json =
+    ai_codeblock_extract(:parser, "parser/03.1_generate_detect_js", :javascript, largest: true)
+    |> ai_object_extract(:parser, "parser/03.2_js_to_json_extractor", :json, schema: ObjectExtractor)
+  all_articles = Local.dom_extractor(html, extractor_json)
 
   possible_ads =
     ai_object_extract(:parser, "parser/04_find_the_ads", :json, schema: Plot)
@@ -54,11 +54,11 @@ foreach(sites, fn {site, i} ->
         possible_ads.possible_ads_by_name[0].summary
         )
 
-    parser_js =
-      ai_codeblock_extract(:parser, "parser/05_revise_the_parser_js", :javascript, largest: true)
+    extractor_json =
+      ai_codeblock_extract(:parser, "parser/05_revise_the_extractor_json", :javascript, largest: true)
   end
 
-  search_sites[i].parser_js = parser_js
+  search_sites[i].extractor_json = extractor_json
 end) # , async: true
 
 # Get the most recent articles from each site
@@ -79,9 +79,7 @@ foreach(search_sites.search_engines, fn {site, i} ->
   foreach(search_urls, fn {url, url_i} ->
     html = Local.load_url_html(url)
 
-    all_articles =
-      html
-      |> Local.html_js_exec(site.parser_js)
+    all_articles = Local.dom_extractor(html, extractor_json)
 
     foreach(all_articles, fn {article, article_i} ->
       html = Local.load_url_html(article.url)

@@ -1,0 +1,47 @@
+Ok, I have a routine that can similarly take a DOM tree, and run a series of filters based on CSS selectors but the script to do the type of thing above can be defined using a simple JSON array like this:
+
+{
+  "first_arrive_at_list_of_items": [
+    { "op": "css_select_many", "css_selector": ".things > .thing[data-detail="object"]" },
+    { "op": "each_item_sub_select_one", "css_selector": ".listing" },
+    { "op": "filter_out_elements", "exclusion_css_selector": "ol > li.advertisement" }
+  ],
+  "second_extract_keys_from_each_item": {
+    "item_name": [
+      { "op": "css_select_one",  "css_selector": "div.aspect > .title" },
+      { "op": "get_text_content", "trim": true, "default": "" }
+    ],
+    "author": [
+      { "op": "css_select_one",  "css_selector": "div.aspect > .written-by > a" },
+      { "op": "get_text_content", "trim": true, "default": "" }
+    ],
+    "date": [
+      { "op": "css_select_one",  "css_selector": "div.header > .rel-time" },
+      { "op": "get_text_content", "trim": true, "default": "now" },
+      { "op": "datetime_to_iso" }
+    ],
+    "url": [
+      { "op": "css_select_one",  "css_selector": "div.header > .rel-time" },
+      { "op": "get_attribute", "attribute_name": "href", "default": "" }
+    ]
+  }
+}
+
+The ops allowed are only the ones mentioned above, and do what the op name implies.
+
+Also, please make sure as much as possible to extract dates to ISO format!
+
+Please give me this following script, but in the JSON notation as above:
+
+===================
+{{ input }}
+===================
+
+Now, I for sure want only these 5 keys in my output HTML JSON:
+- name
+- author
+- date
+- link
+- summary
+
+Please don't leave any keys out!!  If there is no value for a key, just leave it blank.

@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const { JSDOM } = require('jsdom');
+const chrono = require('chrono-node');
+
+const htmlFile = process.argv[2];
+const jsonFile = process.argv[3];
+
+const html = fs.readFileSync(htmlFile, 'utf-8');
+const jsonInstructions = JSON.parse(fs.readFileSync(jsonFile, 'utf-8'));
+
+const dom = new JSDOM(html);
+const { document } = dom.window;
+
+let elements;
+
+// function to print to STDOUT
+const bug = (message) => {
+    console.error(message);
+}
+
+
+// First arrive at list of items
+jsonInstructions.first_arrive_at_list_of_items.forEach(instruction => {
+  bug(instruction)
+  switch (instruction.op) {
+    case 'css_select_many':
+      elements = Array.from(document.querySelectorAll(instruction.css_selector));
+      break;
+    case 'each_item_sub_select_one':
+      elements = elements.map(element => element.querySelector(instruction.css_selector) || element);
+      break;
+    case 'filter_out_elements':
+      elements = elements.filter(element => !element.querySelector(instruction.exclusion_css_selector));
+      break;
+    default:
+      console.error(`Unknown operation: ${instruction.op}`);
+  }
+});
+
+// Second extract keys from each item
+const items = elements.map(element => {
+  bug({element})
+  const item = {};
+  for (const [key, operations] of Object.entries(jsonInstructions.second_extract_keys_from_each_item)) {
+    bug(`  Extract Key: ${key}`)
+    let currentElement = element;
+    for (const operation of operations) {
+        bug(operation)
+        switch (operation.op) {
+        case 'css_select_one':
+          currentElement = currentElement.querySelector(operation.css_selector);
+          break;
+        case 'get_text_content':
+          currentElement = currentElement ? currentElement.textContent : operation.default;
+          if (operation.trim) {
+            currentElement = currentElement.trim();
+            // remove all redundant whitespace, collapsing tabs and newlines into a single space
+            currentElement = currentElement.replace(/\s+/g, ' ');
+          }
+          break;
+        case 'get_attribute':
+          currentElement = currentElement ? currentElement.getAttribute(operation.attribute_name) : operation.default;
+          break;
+        case 'datetime_to_iso':
+          let parsedDate = chrono.parseDate(currentElement);
+          currentElement = parsedDate ? parsedDate.toISOString() : null;
+          break;
+        default:
+          console.error(`Unknown operation: ${operation.op}`);
+      }
+    }
+    item[key] = currentElement;
+  }
+  return item;
+});
+
+console.log(JSON.stringify({ items }));

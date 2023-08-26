@@ -39,7 +39,17 @@ const findDOMTree = (htmlContent, input) => {
     let currentParent = articleNode.parentElement;
     while (currentParent) {
         if (wordsArray.every(word => currentParent.textContent.includes(word))) {
-            return currentParent.outerHTML;
+            // create an array of all of the parent's ancestor tags, just the conten of the open tag
+            let ancestors = [];
+            let currentAncestor = currentParent;
+            while (currentAncestor) {
+                // Get the full open tag of this ancestor, i.e. <div id="foo" class="bar">
+                const HTMLAttributes = currentAncestor.getAttributeNames().map(name => `${name}="${currentAncestor.getAttribute(name)}"`).join(' ');
+                ancestors.push(`<${currentAncestor.tagName.toLowerCase()} ${HTMLAttributes}>`);
+                currentAncestor = currentAncestor.parentElement;
+            }
+
+            return { node_html: currentParent.outerHTML, ancestors: ancestors.reverse() };
         }
         currentParent = currentParent.parentElement;
     }
@@ -53,8 +63,9 @@ if (argv.input) {
         "article_name": argv.article_name,
         "first_few_words_of_each_piece_of_text_in_article_listing": argv._  // The rest of the arguments
     };
-    const htmlPart = findDOMTree(inputData, input);
-    process.stdout.write(htmlPart);
+    const dataObject = findDOMTree(inputData, input);
+    // output in JSON format
+    process.stdout.write(JSON.stringify(dataObject));
 } else {
     let inputData = '';
     process.stdin.on('data', chunk => {
@@ -66,7 +77,8 @@ if (argv.input) {
             "article_name": argv.article_name,
             "first_few_words_of_each_piece_of_text_in_article_listing": argv._  // The rest of the arguments
         };
-        const htmlPart = findDOMTree(inputData, input);
-        process.stdout.write(htmlPart);
+        const dataObject = findDOMTree(inputData, input);
+        // output in JSON format
+        process.stdout.write(JSON.stringify(dataObject));
     });
 }

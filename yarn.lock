@@ -168,6 +168,13 @@
   dependencies:
     "mitt" "3.0.1"
 
+"chrono-node@^2.6.5":
+  "integrity" "sha512-1B4iFd8xJ235PAprvRbs7zaEvmepOrN7dQ5UWjsXoDnlRP1vriGUwmcYw+KeQGKtz+YkgMo7bglf/q/l2VhoxQ=="
+  "resolved" "https://registry.npmjs.org/chrono-node/-/chrono-node-2.6.5.tgz"
+  "version" "2.6.5"
+  dependencies:
+    "dayjs" "^1.10.0"
+
 "cliui@^8.0.1":
   "integrity" "sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ=="
   "resolved" "https://registry.npmjs.org/cliui/-/cliui-8.0.1.tgz"
@@ -261,6 +268,11 @@
     "abab" "^2.0.6"
     "whatwg-mimetype" "^3.0.0"
     "whatwg-url" "^12.0.0"
+
+"dayjs@^1.10.0":
+  "integrity" "sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA=="
+  "resolved" "https://registry.npmjs.org/dayjs/-/dayjs-1.11.9.tgz"
+  "version" "1.11.9"
 
 "debug@^4.1.1", "debug@^4.3.4", "debug@4", "debug@4.3.4":
   "integrity" "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ=="
