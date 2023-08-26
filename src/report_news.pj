@@ -10,7 +10,7 @@ articles_grouped = Local.ReportNews.group_articles_by_time_period(db)
 # Load DB with any completed months
 foreach(articles_grouped.months, fn {articles, month} ->
   if ! db.by_month[month] do
-    db.by_month[month] = ai_object_extract(:reporter, "reporter/00_summarize_month")
+    db.by_month[month] = ai_object_extract(:reporter, "reporter/00_summarize_month", :json, schema: Plot)
   end
 end)
 

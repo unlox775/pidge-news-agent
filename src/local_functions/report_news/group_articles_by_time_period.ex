@@ -1,4 +1,4 @@
-def function(db) {
+def function(db) do
   # 1. Last month:
   current_date = Date.utc_today()
   first_of_current_month = Date.new(current_date.year, current_date.month, 1)
@@ -30,7 +30,7 @@ defp to_year_month(date) do
   year = date.year
   month = date.month
   "#{year}-#{String.pad_leading(Integer.to_string(month), 2, "0")}"
-end}
+end
 
 def compile_last_week(db, last_week_days) do
   last_week_days
@@ -59,5 +59,5 @@ def compile_last_year(db, last_year_months) do
   |> Enum.reduce(%{}, fn month, acc ->
     acc
     |> Map.put(month, compile_last_month(db, month))
-  end
+  end)
 end

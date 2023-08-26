@@ -6,11 +6,12 @@ search_intent = ai_prompt(:bird, "bird/00_confirm_search_intent", human_input: t
 
 new_search_sites =
   search_intent
-  |> ai_object_extract(:bird, "bird/01_get_new_sites_and_terms")
+  |> ai_object_extract(:bird, "bird/01_get_new_sites_and_terms", :json, optional_human_input: true, schema: Plot)
 search_sites.search_engines <~ new_search_sites.search_engines
+sites = Local.get_sites_list(search_sites.search_engines)
 
 # Compile a parser_js for each site
-foreach(search_sites.search_engines, fn {site, i} ->
+foreach(sites, fn {site, i} ->
   if site.parser_js do
     continue
   end
@@ -25,36 +26,36 @@ foreach(search_sites.search_engines, fn {site, i} ->
       html = Local.try_all_inputs_enterkey(site.search_term[0])
   end
 
-  page_as_markdown = Local.to_markdown(html, 2000)
+  page_as_markdown = Local.to_markdown(html, 2000, 18000)
 
   first_articles_strings =
-    html
-    |> Local.to_markdown(2000)
-    |> ai_object_extract(:bird, "bird/02_find_first_articles_text")
+    page_as_markdown
+    |> ai_object_extract(:bird, "bird/02_find_first_articles_text", :json, schema: Plot)
 
-  first_article_html =
-    html
-    |> Local.find_subhtml(string: first_article_strings.article_name, ext_strings: first_article_strings.first_few_words_of_each_piece_of_text_in_article_listing)
+  first_article_html = Local.find_subhtml(
+    html,
+    first_articles_strings.first.article_name,
+    first_articles_strings.first.first_few_words_of_each_piece_of_text_in_article_listing
+    )
 
-  parser_js = ai_prompt(:parser, "parser/03_generate_detect_js") |> Local.js_script_extract()
+  parser_js = ai_codeblock_extract(:parser, "parser/03_generate_detect_js", :javascript, largest: true)
   all_articles =
     html
-    |> Local.html_js_exec(js: parser_js)
+    |> Local.html_js_exec(parser_js)
 
   possible_ads =
-    ai_object_extract(:parser, "parser/04_find_the_ads")
+    ai_object_extract(:parser, "parser/04_find_the_ads", :json, schema: Plot)
 
-  if count(possible_ads) > 0 do
+  if possible_ads.length > 0 do
     first_possible_ad_html =
       html
       |> Local.find_subhtml(
-        string: possible_ads.possible_ads_by_name[0].name,
-        ext_strings: [possible_ads.possible_ads_by_name[0].summary]
+        possible_ads.possible_ads_by_name[0].name,
+        possible_ads.possible_ads_by_name[0].summary
         )
 
     parser_js =
-      ai_prompt(:parser, "parser/05_revise_the_parser_js")
-      |> Local.js_script_extract()
+      ai_codeblock_extract(:parser, "parser/05_revise_the_parser_js", :javascript, largest: true)
   end
 
   search_sites[i].parser_js = parser_js
@@ -80,13 +81,13 @@ foreach(search_sites.search_engines, fn {site, i} ->
 
     all_articles =
       html
-      |> Local.html_js_exec(js: site.parser_js)
+      |> Local.html_js_exec(site.parser_js)
 
     foreach(all_articles, fn {article, article_i} ->
+      html = Local.load_url_html(article.url)
       article_summary =
-        Local.load_url_html(article.url)
-        |> Local.extract_strings(2000)
-        |> ai_object_extract(:reader, "reader/06_read_article_extract_summary")
+        Local.to_markdown(html, 2000, 18000)
+        |> ai_object_extract(:reader, "reader/06_read_article_extract_summary", :json, schema: Plot)
 
       article_summary.url = article.url
 

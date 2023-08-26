@@ -2,6 +2,14 @@ I am interested in staying up with the news on this:
 
 {{ input }}
 
+{% if human_input %}
+
+  But my most important advice, is this.  Please pay close attention:
+
+  {{ human_input }}
+
+{% endif %}
+
 Can you give me a JSON of a list of URLs of news sites I might have better luck using?
   
 Please also give me a list of 2 or 3 search terms I could use on each search engine which might help me be more effective.  Please distinguish between sites that the home page is a list of articles that is already relevant (without needing a search term) and sites that require a search term to be effective to find the news we need.  Give this as a `type` value, one of:

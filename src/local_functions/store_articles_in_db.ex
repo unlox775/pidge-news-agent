@@ -16,6 +16,7 @@ def function(all_articles, db) do
         meta = Map.get(article, :meta, %{})
 
         updated_meta =
+          meta
           |> Map.put(:recrawl_count, Map.get(meta, :crawl_count, 0) + 1)
           |> Map.put(:recrawl_summaries, Map.get(meta, :crawl_summaries, []) ++ [article.one_thorough_sentence_summary])
 

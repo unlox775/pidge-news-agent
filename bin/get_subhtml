@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+
+const yargs = require('yargs');
+const fs = require('fs');
+const { JSDOM } = require('jsdom');
+
+const argv = yargs
+    .option('article_name', {
+        describe: 'Name of the article',
+        type: 'string',
+        demandOption: true
+    })
+    .option('input', {
+        describe: 'Input HTML file',
+        type: 'string'
+    })
+    .argv;
+
+const findDOMTree = (htmlContent, input) => {
+    const dom = new JSDOM(htmlContent);
+    const document = dom.window.document;
+
+    let articleNodes = Array.from(document.querySelectorAll('*'));
+    let articleNode = articleNodes.find(node => {
+        let childNodes = Array.from(node.childNodes);
+        return childNodes.some(child => child.nodeType === 3 && child.textContent.includes(input.article_name));
+    });
+
+    if (!articleNode) {
+        return "Article node not found!";
+    }
+
+    let wordsArray = [];
+    input.first_few_words_of_each_piece_of_text_in_article_listing.forEach(text => {
+        let words = text.split(/\W+/);
+        wordsArray = wordsArray.concat(words);
+    });
+
+    let currentParent = articleNode.parentElement;
+    while (currentParent) {
+        if (wordsArray.every(word => currentParent.textContent.includes(word))) {
+            return currentParent.outerHTML;
+        }
+        currentParent = currentParent.parentElement;
+    }
+
+    return "Matching parent node not found!";
+};
+
+if (argv.input) {
+    const inputData = fs.readFileSync(argv.input, 'utf-8');
+    const input = {
+        "article_name": argv.article_name,
+        "first_few_words_of_each_piece_of_text_in_article_listing": argv._  // The rest of the arguments
+    };
+    const htmlPart = findDOMTree(inputData, input);
+    process.stdout.write(htmlPart);
+} else {
+    let inputData = '';
+    process.stdin.on('data', chunk => {
+        inputData += chunk;
+    });
+
+    process.stdin.on('end', () => {
+        const input = {
+            "article_name": argv.article_name,
+            "first_few_words_of_each_piece_of_text_in_article_listing": argv._  // The rest of the arguments
+        };
+        const htmlPart = findDOMTree(inputData, input);
+        process.stdout.write(htmlPart);
+    });
+}

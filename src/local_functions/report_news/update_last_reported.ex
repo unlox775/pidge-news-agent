@@ -10,4 +10,5 @@ def function(report, last_reported) do
     previous_report.last_report_date,
     previous_report
     ))
+
 end

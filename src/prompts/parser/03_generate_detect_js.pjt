@@ -1,6 +1,6 @@
 Ok, I have this DOM element:
 
-{{ first_article_dom }}
+{{ first_article_html }}
 
 Now, I want you to give me some JS based on this HTML, to detect and find all of the articles on this page, and extract the following JSON format for each:
 

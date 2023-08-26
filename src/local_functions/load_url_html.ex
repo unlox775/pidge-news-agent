@@ -7,5 +7,7 @@ def function(url) do
 
   # Run the bin/html_to_markdown command-line script in a shell.
   #   pipe in html using bash, and return the result
+  IO.puts("Running Puppeteer to get HTML from URL: #{url}")
   {html, 0} = System.cmd("bin/get_url_html_post_js_render", [url], into: "")
+  html
 end
