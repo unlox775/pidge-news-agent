@@ -46,17 +46,17 @@ foreach(sites, fn {site, i} ->
   possible_ads =
     ai_object_extract(:parser, "parser/04_find_the_ads", :json, schema: Plot)
 
-  if possible_ads.length > 0 do
-    first_possible_ad_html =
-      html
-      |> Local.find_subhtml(
-        possible_ads.possible_ads_by_name[0].name,
-        possible_ads.possible_ads_by_name[0].summary
-        )
+  # if possible_ads.possible_ads_by_name[0] do
+  #   first_possible_ad_html =
+  #     html
+  #     |> Local.find_subhtml(
+  #       possible_ads.possible_ads_by_name[0].name,
+  #       possible_ads.possible_ads_by_name[0].summary
+  #       )
 
-    extractor_json =
-      ai_codeblock_extract(:parser, "parser/05_revise_the_extractor_json", :javascript, largest: true)
-  end
+  #   extractor_json =
+  #     ai_codeblock_extract(:parser, "parser/05_revise_the_extractor_json", :javascript, largest: true)
+  # end
 
   search_sites[i].extractor_json = extractor_json
 end) # , async: true
